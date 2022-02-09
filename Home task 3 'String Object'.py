@@ -54,7 +54,8 @@ sentence_from_last_words = ' ' + sentence_from_last_words.strip(' ').capitalize(
 #print(sentence_from_last_words) # Test
 
 # Final text.
-result = (capitalized_text[:241] + sentence_from_last_words + capitalized_text[241:]).replace(' iz ', ' is ')
+result = capitalized_text.replace('add it to the end of this paragraph.', f'add it to the end of this paragraph.{sentence_from_last_words}')
+result =  result.replace(' iz ', ' is ')
 print(result)
 
 # Whitespace counter.
