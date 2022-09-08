@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime, date, time, timedelta
 import fileinput
 import string
@@ -5,22 +6,22 @@ import csv
 import re
 from ht4_2 import text_capitalazing, iz_replace
 
-output_path = '..\\Magazine.txt'
-source_path = '..\\Publication.txt'
+output_path = 'Magazine.txt'
+source_path = 'Publication.txt'
 
 def FYI():
-    print(f"""Current path for all publication is {output_path}
-Current path for the sourse file from which new posts are taken and added to the Journal is {source_path}
-
-The sourse file should be in .txt extension and consist data if folowing format:
-News--News text--City
-PrivateAd--PrivateAd text--YYYY-MM-DD
-Recipe--Recipe text--Time to cook
-
-Each line is a separate post and must begin with 'News', 'PrivateAd' or 'Recipe'.
-'--' is the separator between the header, text and the footer.
-The text of the publication cannot be an empty space.
-The day when advertisement expires must be in the correct format and cannot be a date that has already passed.\n""")
+    print(f"""Current path for all publication is {output_path} 
+Current path for the source file from which new posts are taken and added to the Journal is {source_path} 
+ 
+The source file should be in .txt extension and consist of data if following format: 
+News--News text--City 
+PrivateAd--PrivateAd text--YYYY-MM-DD 
+Recipe--Recipe text--Time to cook 
+ 
+Each line is a separate post and must begin with 'News', 'PrivateAd' or 'Recipe'. 
+'--' is the separator between the header, text and the footer. 
+The text of the publication cannot be an empty space. 
+The day when the advertisement expires must be in the correct format and cannot be a date that has already passed.\n""")
 
 class Publication:
     def __init__(self, head = '', body = '', foot = ''):
@@ -37,7 +38,7 @@ class Publication:
             while text == '':
                 text = input('Enter your text:\n')
                 if text == '':
-                    print("You haven't enter any text, please try again")
+                    print("You haven't entered any text, please try again")
         return f"{text}\n"
 
     def create_footer(self, foot):
@@ -54,7 +55,7 @@ class News(Publication):
 
     def create_footer(self, foot = ''):
         if foot == '':
-            foot = input('Pleas enter the name of city:\n')
+            foot = input('Please enter the name of the city:\n')
         return f"{foot} {datetime.now().strftime('%d-%m-%Y %H:%M')}\n\n"
 
 class PrivateAd(Publication):
@@ -68,7 +69,7 @@ class PrivateAd(Publication):
                     expire_date = input('Please enter the day when your advertisement expires in format YYYY-MM-DD:\n')
                     days_left = (datetime.strptime(expire_date, '%Y-%m-%d') - datetime.today()).days + 1
                 except ValueError:
-                    print("Invalid input\nFor example:\nFor February 14, 2022 input should looks like 2022-2-14")
+                    print("Invalid input\nFor example:\nFor February 14, 2022 input should look like 2022-2-14")
                     continue
                 else:
                     if days_left < 0:
@@ -77,7 +78,7 @@ class PrivateAd(Publication):
                         break
         days_left = (datetime.strptime(expire_date, '%Y-%m-%d') - datetime.today()).days + 1
         if days_left == 0:
-            return f"Actual until: {expire_date}  Today is the last day. Don't miss your chance ;)\n\n"
+            return f"Actual until: {expire_date}.  Today is the last day. Don't miss your chance ;)\n\n"
         elif days_left > 0:
             return f"Actual until: {expire_date},  {days_left} days left.\n\n"
 
@@ -93,10 +94,10 @@ class Recipe(Publication):
 
 class Operator():
     def publish(self):
-        choice = input("""Choose what kind of publication you want to create:\nN fo news\nP for PrivateAd\nR for Recipe\n""").lower()
-        if choice not in ['n','p','r']:
-            print('Your input is invalid. Please try again.')
-            self.publish()
+        choice = input("""Choose what kind of publication you want to create:\nN fo news\nP for PrivateAd\nR for Recipe
+E for exit the program\n""").lower()
+        if choice not in ['n','p','r', 'e']:
+            return print('Your input is invalid. Please try again.'), self.publish()
         else:
             if choice == 'n':
                 pub = News()
@@ -104,39 +105,58 @@ class Operator():
                 pub = PrivateAd()
             elif choice == 'r':
                 pub = Recipe()
+            elif choice == 'e':
+                print('Program ended')
+                sys.exit()
         if 'pub' in locals():
             pub.add()
-        pros =  input('Do you want to make enother publication?\nY for Yes\nN for No\n').lower()
-        if pros == 'y':
-            self.publish()
-        elif pros == 'n':
-            return print('Program ended')
+        pros =  input('Do you want to make another publication?\nY for Yes\nN for No\n').lower()
+        if pros not in ['y', 'n']:
+            print('Your input is invalid. Please try again.\nY for Yes\nN for No\n')
+        else:
+            if pros == 'y':
+                self.publish()
+            elif pros == 'n':
+                return print('Program ended')
 
 
     def file_publish(self):
-        for line in fileinput.input(files= source_path):
-            splt_line = line.split('--')
-            head = splt_line[0]
-            body = iz_replace(text_capitalazing(splt_line[1]))
-            x = splt_line[2]
-            if x[-1] == '\n':
-                foot = x[:len(x) - 1]
-            else:
-                foot = splt_line[2]
-            if head == 'News':
-                pub = News(body=body, foot=foot)
-                pub.add()
-            elif head == 'PrivateAd':
-                pub = PrivateAd(body=body, foot=foot)
-                pub.add()
-            elif head == 'Recipe':
-                pub = Recipe(body=body, foot=foot)
-                pub.add()
+        if source_path.endswith('.txt'):
+            try:
+                for line in fileinput.input(files= source_path):
+                    splt_line = line.split('--')
+                    head = splt_line[0]
+                    body = iz_replace(text_capitalazing(splt_line[1]))
+                    x = splt_line[2]
+                    if x[-1] == '\n':
+                        foot = x[:len(x) - 1]
+                    else:
+                        foot = splt_line[2]
+                    if '' in [head,body,foot]:
+                         print(no_empty_space_head_body_foot)
+                    if head == 'News':
+                        pub = News(body=body, foot=foot)
+                        pub.add()
+                    elif head == 'PrivateAd':
+                        pub = PrivateAd(body=body, foot=foot)
+                        pub.add()
+                    elif head == 'Recipe':
+                        pub = Recipe(body=body, foot=foot)
+                        pub.add()
+            except:
+                return print("""Invalid format of file content. Please reload the program.
+Read the Info and change the content of the file.       
+Alternatively, you can also select a different file in the settings.\nProgram ended """)
+        else:
+            return print(f"""File {source_path} should have .txt extension.
+Please reload the program. And change the file extension or choose another file in the settings.\n
+Program ended""")
+
 
     def start(self):
-        choice = input("""Do you whant to make publication by console input or from file:
-C for console input\nF for from file\nI to view info\nS for change settings\n""").lower()
-        if choice not in ['c', 'f', 'i', 's']:
+        choice = input("""Do you want to make publication by console input or from file:
+C for console input\nF for from file\nI to view info\nS for change settings\nE for exit the program\n""").lower()
+        if choice not in ['c', 'f', 'i', 's', 'e']:
             print('Your input is invalid. Please try again.')
             self.start()
         else:
@@ -149,14 +169,18 @@ C for console input\nF for from file\nI to view info\nS for change settings\n"""
                 self.start()
             elif choice == 's':
                 self.set_settings()
+            elif choice == 'e':
+                print('Program ended')
+                sys.exit()
 
     def set_settings(self):
         global source_path
         global output_path
         print(f"""Current path for all publication is {output_path}
 Current path for the sourse file from which new posts are taken and added to the Journal is {source_path}""")
-        setting = input("""O for change path to output\nS for change path to source\nP to proceed without any changes\n""").lower()
-        if setting not in ['o', 's', 'p']:
+        setting = input("""O for change path to output\nS for change path to source\nP to proceed without any changes
+E for exit the program\n""").lower()
+        if setting not in ['o', 's', 'p', 'e']:
             print('Your input is invalid. Please try again.')
             self.set_settings()
         else:
@@ -164,13 +188,13 @@ Current path for the sourse file from which new posts are taken and added to the
                 output_path = input('Please enter new path for publications\n')
                 proceed = input('Do You also want to chande path to source?\nY/N\n').lower()
                 if proceed == 'y':
-                    source_path = input('Please enter new path for the sourse file\n')
+                    source_path = input('Please enter new path for the source file\n')
                     self.start()
                 else:
                     self.start()
             elif setting == 's':
-                source_path = input('Please enter new path for the sourse file\n')
-                proceed = input('Do You also want to chande path for publications?\nY/N\n').lower()
+                source_path = input('Please enter new path for the source file\n')
+                proceed = input('Do You also want to change path for publications?\nY/N\n').lower()
                 if proceed == 'y':
                     output_path = input('Please enter new path to the output file\n')
                     self.start()
@@ -178,6 +202,9 @@ Current path for the sourse file from which new posts are taken and added to the
                     self.start()
             elif setting == 'p':
                 self.start()
+            elif choice == 'e':
+                print('Program ended')
+                sys.exit()
 
 # Csv Creatin part
 # import string
@@ -201,7 +228,7 @@ def words_statistic():
             else:
                 word_dict[word] = 1
 
-    with open('..\\WordsStatistic.csv', 'w', newline='') as csvfile:
+    with open('WordsStatistic.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter='-')
         for key in list(word_dict.keys()):
             writer.writerow([key, word_dict[key]])
@@ -228,7 +255,7 @@ def letter_statistic():
         for key in list(matrix.keys()):
             matrix[key][2] = round((matrix[key][0] / letters_counter * 100), 2)
 
-    with open('..\\LetterStatistic.csv', 'w', newline='') as csvfile:
+    with open('LetterStatistic.csv', 'w', newline='') as csvfile:
         headers = ['letter', 'cout_all', 'count_uppercase', 'percentage']
         writer = csv.DictWriter(csvfile, fieldnames= headers)
         writer.writeheader()
