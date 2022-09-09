@@ -1,4 +1,5 @@
 import json
+import sys
 from datetime import datetime, date, time, timedelta
 import fileinput
 import string
@@ -7,40 +8,40 @@ import re
 import os
 from ht4_2 import text_capitalazing, iz_replace
 
-output_path = '..\\Magazine.txt'
-source_path = '..\\Publication.txt'
-json_source_path = '..\\Publication.json'
+output_path = 'Magazine.txt'
+source_path = 'Publication.txt'
+json_source_path = 'Publication.json'
 
 def FYI():
-    print(f"""Current path for all publication is {output_path}
-Current path for the source txt file from which new posts are taken and added to the Journal is {source_path}
-Current path for the source json file is {json_source_path}
+    print(f"""Current path for all publication is {output_path} 
+Current path for the source TXT file from which new posts are taken and added to the Journal is {source_path} 
+Current path for the source JSON file is {json_source_path} 
 """)
-    print("""           JSON
-The source json file should be in .json extension and consist data if folowing format:
-One publication:
-{"head": "PrivateAd", "body": "PrivateAd text", "foot": "YYYY-MM-DD"}
+    print("""           JSON 
+The source json file should be in .json extension and consist of data in following format: 
+One publication: 
+{"head": "PrivateAd", "body": "PrivateAd text", "foot": "YYYY-MM-DD"} 
 
-Several publications:
-[
-    {"head": "News", "body": "News text", "foot": "City"}
-,  {"head": "PrivateAd", "body": "PrivateAd text", "foot": "YYYY-MM-DD"}
-,  {"head": "Recipe", "body": "Recipe text", "foot": "Time to cook"}
-]
+Several publications: 
+[ 
+    {"head": "News", "body": "News text", "foot": "City"} 
+,  {"head": "PrivateAd", "body": "PrivateAd text", "foot": "YYYY-MM-DD"} 
+,  {"head": "Recipe", "body": "Recipe text", "foot": "Time to cook"} 
+] 
 
-The text of the publication cannot be an empty space.
-The day when advertisement expires must be in the correct format and cannot be a date that has already passed.
+The text of the publication cannot be an empty space. 
+The day when the advertisement expires must be in the correct format and cannot be a date that has already passed. 
 
-            TXT
-The source txt file should be in .txt extension and consist data if folowing format:
-News--News text--City
-PrivateAd--PrivateAd text--YYYY-MM-DD
-Recipe--Recipe text--Time to cook
+            TXT 
+The source TXT file should be in .txt extension and consist of data in following format: 
+News--News text--City 
+PrivateAd--PrivateAd text--YYYY-MM-DD 
+Recipe--Recipe text--Time to cook 
 
-Each line is a separate post and must begin with 'News', 'PrivateAd' or 'Recipe'.
-'--' is the separator between the header, text and the footer.
-The text of the publication cannot be an empty space.
-The day when advertisement expires must be in the correct format and cannot be a date that has already passed.\n""")
+Each line is a separate post and must begin with 'News', 'PrivateAd' or 'Recipe'. 
+'--' is the separator between the header, text and the footer. 
+The text of the publication cannot be an empty space. 
+The day when the advertisement expires must be in the correct format and cannot be a date that has already passed.\n""")
 
 class Publication:
     def __init__(self, head = '', body = '', foot = ''):
@@ -57,7 +58,7 @@ class Publication:
             while text == '':
                 text = input('Enter your text:\n')
                 if text == '':
-                    print("You haven't enter any text, please try again")
+                    print("You haven't entered any text, please try again")
         return f"{text}\n"
 
     def create_footer(self, foot):
@@ -88,7 +89,7 @@ class PrivateAd(Publication):
                     expire_date = input('Please enter the day when your advertisement expires in format YYYY-MM-DD:\n')
                     days_left = (datetime.strptime(expire_date, '%Y-%m-%d') - datetime.today()).days + 1
                 except ValueError:
-                    print("Invalid input\nFor example:\nFor February 14, 2022 input should looks like 2022-2-14")
+                    print("Invalid input\nFor example:\nFor February 14, 2022 input should look like 2022-2-14")
                     continue
                 else:
                     if days_left < 0:
@@ -97,7 +98,7 @@ class PrivateAd(Publication):
                         break
         days_left = (datetime.strptime(expire_date, '%Y-%m-%d') - datetime.today()).days + 1
         if days_left == 0:
-            return f"Actual until: {expire_date}  Today is the last day. Don't miss your chance ;)\n\n"
+            return f"Actual until: {expire_date}.  Today is the last day. Don't miss your chance ;)\n\n"
         elif days_left > 0:
             return f"Actual until: {expire_date},  {days_left} days left.\n\n"
 
@@ -113,9 +114,9 @@ class Recipe(Publication):
 
 class Operator():
     def start(self):
-        choice = input("""Do you whant to make publication by console input, from file input or json input:
-C for console input\nF for from file\nJ for json input\nI to view info\nS for change settings\n""").lower()
-        if choice not in ['c', 'f', 'i', 's', 'j']:
+        choice = input("""Do you want to make a publication by console input, from TXT file input or JSON input: 
+C for Console input\nF for from txt File\nJ for Json input\nI to view Info\nS for change Settings\nE for Exit the program\n""").lower()
+        if choice not in ['c', 'f', 'i', 's', 'j', 'e']:
             print('Your input is invalid. Please try again.')
             self.start()
         else:
@@ -130,12 +131,15 @@ C for console input\nF for from file\nJ for json input\nI to view info\nS for ch
                 self.set_settings()
             elif choice == 'j':
                 self.json_publish()
+            elif choice == 'e':
+                print('Program ended')
+                sys.exit()
 
     def publish(self):
-        choice = input("""Choose what kind of publication you want to create:\nN fo news\nP for PrivateAd\nR for Recipe\n""").lower()
-        if choice not in ['n','p','r']:
-            print('Your input is invalid. Please try again.')
-            self.publish()
+        choice = input("""Choose what kind of publication you want to create:\nN fo news\nP for PrivateAd\nR for Recipe
+E for exit the program\n""").lower()
+        if choice not in ['n', 'p', 'r', 'e']:
+            return print('Your input is invalid. Please try again.'), self.publish()
         else:
             if choice == 'n':
                 pub = News()
@@ -143,51 +147,70 @@ C for console input\nF for from file\nJ for json input\nI to view info\nS for ch
                 pub = PrivateAd()
             elif choice == 'r':
                 pub = Recipe()
+            elif choice == 'e':
+                print('Program ended')
+                sys.exit()
         if 'pub' in locals():
             pub.add()
-        pros =  input('Do you want to make enother publication?\nY for Yes\nN for No\n').lower()
-        if pros == 'y':
-            self.publish()
-        elif pros == 'n':
-            return print('Program ended')
+        pros = input('Do you want to make another publication?\nY for Yes\nN for No\n').lower()
+        if pros not in ['y', 'n']:
+            print('Your input is invalid. Please try again.\nY for Yes\nN for No\n')
+        else:
+            if pros == 'y':
+                self.publish()
+            elif pros == 'n':
+                return print('Program ended')
 
     def file_publish(self):
-        for line in fileinput.input(files= source_path):
-            splt_line = line.split('--')
-            head = splt_line[0]
-            body = iz_replace(text_capitalazing(splt_line[1]))
-            x = splt_line[2]
-            if x[-1] == '\n':
-                foot = x[:len(x) - 1]
-            else:
-                foot = splt_line[2]
-            if head == 'News':
-                pub = News(body=body, foot=foot)
-                pub.add()
-            elif head == 'PrivateAd':
-                pub = PrivateAd(body=body, foot=foot)
-                pub.add()
-            elif head == 'Recipe':
-                pub = Recipe(body=body, foot=foot)
-                pub.add()
+        if source_path.endswith('.txt'):
+            try:
+                for line in fileinput.input(files=source_path):
+                    splt_line = line.split('--')
+                    head = splt_line[0]
+                    body = iz_replace(text_capitalazing(splt_line[1]))
+                    x = splt_line[2]
+                    if x[-1] == '\n':
+                        foot = x[:len(x) - 1]
+                    else:
+                        foot = splt_line[2]
+                    if '' in [head, body, foot]:
+                        print(no_empty_space_head_body_foot)
+                    if head == 'News':
+                        pub = News(body=body, foot=foot)
+                        pub.add()
+                    elif head == 'PrivateAd':
+                        pub = PrivateAd(body=body, foot=foot)
+                        pub.add()
+                    elif head == 'Recipe':
+                        pub = Recipe(body=body, foot=foot)
+                        pub.add()
+            except:
+                return print("""Invalid format of file content. Please reload the program.
+Read the Info and change the content of the file.       
+Alternatively, you can also select a different file in the settings.\nProgram ended """)
+        else:
+            return print(f"""File {source_path} should have .txt extension.
+Please reload the program. And change the file extension or choose another file in the settings.\n
+Program ended""")
 
     def set_settings(self):
         global source_path
         global output_path
         global json_source_path
         print(f"""Current path for all publication is {output_path}
-Current path for the source txt file is {source_path}
-Current path for the source json file is {json_source_path}""")
-        setting = input("""O for change path to output\nS for change path to txt source
-J for change path to json source
-P to proceed without any changes\n""").lower()
-        if setting not in ['o', 's', 'p','j']:
+Current path for the source TXT file is {source_path}
+Current path for the source JSON file is {json_source_path}""")
+        setting = input("""O for change path to Output\nS for change path to txt Source
+J for change path to Json source
+P to Proceed without any changes
+E for exit the program\n""").lower()
+        if setting not in ['o', 's', 'p', 'j', 'e']:
             print('Your input is invalid. Please try again.')
             self.set_settings()
         else:
             if setting == 'o':
                 output_path = input('Please enter new path for publications\n')
-                proceed = input('Do You also want to chande path to source?\nY/N\n').lower()
+                proceed = input('Do You also want to change path to source?\nY/N\n').lower()
                 if proceed == 'y':
                     source_path = input('Please enter new path for the source file\n')
                     self.start()
@@ -195,7 +218,7 @@ P to proceed without any changes\n""").lower()
                     self.start()
             elif setting == 's':
                 source_path = input('Please enter new path for the source txt file\n')
-                proceed = input('Do You also want to chande path for publications?\nY/N\n').lower()
+                proceed = input('Do You also want to change path for publications?\nY/N\n').lower()
                 if proceed == 'y':
                     output_path = input('Please enter new path to the output file\n')
                     self.start()
@@ -204,28 +227,55 @@ P to proceed without any changes\n""").lower()
             elif setting == 'p':
                 self.start()
 
-            if setting == 'j':
+            elif setting == 'j':
                 json_source_path = input('Please enter new path for the json source\n')
-                proceed = input('Do You also want to chande path for publications?\nY/N\n').lower()
+                proceed = input('Do You also want to change path for publications?\nY/N\n').lower()
                 if proceed == 'y':
                     output_path = input('Please enter new path to the output file\n')
                     self.start()
                 else:
                     self.start()
 
-    def json_publish(self):
-        try:
-            json_input = json.load(open(json_source_path))
+            elif setting == 'e':
+                print('Program ended')
+                sys.exit()
 
-            if type(json_input) == list:
-                for element in json_input:
-                    head = element['head']
-                    body = iz_replace(text_capitalazing(element['body']))
-                    x = element['foot']
+    def json_publish(self):
+        if json_source_path.endswith('.json'):
+            try:
+                json_input = json.load(open(json_source_path))
+
+                if type(json_input) == list:
+                    for element in json_input:
+                        head = element['head']
+                        body = iz_replace(text_capitalazing(element['body']))
+                        x = element['foot']
+                        if x[-1] == '\n':
+                            foot = x[:len(x) - 1]
+                        else:
+                            foot = element['foot']
+                        if '' in [head, body, foot]:
+                            print(no_empty_space_head_body_foot)
+                        if head == 'News':
+                            pub = News(body=body, foot=foot)
+                            pub.add()
+                        elif head == 'PrivateAd':
+                            pub = PrivateAd(body=body, foot=foot)
+                            pub.add()
+                        elif head == 'Recipe':
+                            pub = Recipe(body=body, foot=foot)
+                            pub.add()
+
+                if type(json_input) == dict:
+                    head = json_input['head']
+                    body = iz_replace(text_capitalazing(json_input['body']))
+                    x = json_input['foot']
                     if x[-1] == '\n':
                         foot = x[:len(x) - 1]
                     else:
-                        foot = element['foot']
+                        foot = json_input['foot']
+                    if '' in [head, body, foot]:
+                        print(no_empty_space_head_body_foot)
                     if head == 'News':
                         pub = News(body=body, foot=foot)
                         pub.add()
@@ -236,34 +286,22 @@ P to proceed without any changes\n""").lower()
                         pub = Recipe(body=body, foot=foot)
                         pub.add()
 
-            if type(json_input) == dict:
-                head = json_input['head']
-                body = iz_replace(text_capitalazing(json_input['body']))
-                x = json_input['foot']
-                if x[-1] == '\n':
-                    foot = x[:len(x) - 1]
-                else:
-                    foot = json_input['foot']
-                if head == 'News':
-                    pub = News(body=body, foot=foot)
-                    pub.add()
-                elif head == 'PrivateAd':
-                    pub = PrivateAd(body=body, foot=foot)
-                    pub.add()
-                elif head == 'Recipe':
-                    pub = Recipe(body=body, foot=foot)
-                    pub.add()
-
-        except:
-            print("Something went wrong. Try to read Info or reach code writer for clarification\n")
-            self.start()
-        else:
+            except:
+                return print("""Invalid format of JSON file content. Please reload the program.
+Read the Info and change the content of the file.       
+Alternatively, you can also select a different file in the settings.\nProgram ended """)
             os.remove(json_source_path)
-            print('json source file deleted')
+            print('JSON source file deleted')
+            print('Program ended')
+        else:
+            return print(f"""File {json_source_path} should have .json extension.
+Please reload the program. And change the file extension or choose another file in the settings.\n
+Program ended""")
+
 
 def words_statistic():
     word_dict = {}
-    with open( output_path, 'r') as magazine:
+    with open(output_path, 'r') as magazine:
         text = magazine.read()
         row_list = re.sub("[^\w']", " ", text).split()
         temp_str = ''
@@ -278,7 +316,7 @@ def words_statistic():
             else:
                 word_dict[word] = 1
 
-    with open('..\\WordsStatistic.csv', 'w', newline='') as csvfile:
+    with open('WordsStatistic.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter='-')
         for key in list(word_dict.keys()):
             writer.writerow([key, word_dict[key]])
@@ -305,12 +343,12 @@ def letter_statistic():
         for key in list(matrix.keys()):
             matrix[key][2] = round((matrix[key][0] / letters_counter * 100), 2)
 
-    with open('..\\LetterStatistic.csv', 'w', newline='') as csvfile:
-        headers = ['letter', 'cout_all', 'count_uppercase', 'percentage']
+    with open('LetterStatistic.csv', 'w', newline='') as csvfile:
+        headers = ['letter', 'count_all', 'count_uppercase', 'percentage']
         writer = csv.DictWriter(csvfile, fieldnames= headers)
         writer.writeheader()
         for key in list(matrix.keys()):
-            writer.writerow({'letter':key, 'cout_all':matrix[key][0], 'count_uppercase':matrix[key][1], 'percentage':matrix[key][2]})
+            writer.writerow({'letter':key, 'count_all':matrix[key][0], 'count_uppercase':matrix[key][1], 'percentage':matrix[key][2]})
 
 x = Operator()
 x.start()
